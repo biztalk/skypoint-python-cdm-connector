@@ -10,6 +10,9 @@ __pycache__/
 .vs
 .vs/*
 
+# foo.* temp files
+foo.*
+
 # Distribution / packaging
 .Python
 build/
