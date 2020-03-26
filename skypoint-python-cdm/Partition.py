@@ -10,8 +10,7 @@ class Partition(DataObject):
     def __init__(self, schema=[]):
         self.schema = schema + [
             SchemaEntry("refreshTime", DateTimeOffset),
-            SchemaEntry("location", Uri),
-            SchemaEntry("fileFormatSettings", FileFormatSettings)
+            SchemaEntry("location", Uri)
         ]
         super().__init__(self.schema)
 

@@ -10,8 +10,12 @@ from Reference import ReferenceCollection
 from Attribute import Attribute
 from Annotation import Annotation
 from AttributeReference import AttributeReference
+from Partition import Partition
+from Partition import PartitionCollection
 from datetime import datetime
 from utils import String
+import pandas as pd
+import numpy as np
 import utils
 import json
 import pprint
@@ -133,9 +137,6 @@ class Model(DataObject):
         return True
 
 
-    def print(self):
-        pprint.pprint(self.entities)
-
     def toJson(self):
         result = dict()
         result["application"] = self.application
@@ -149,5 +150,55 @@ class Model(DataObject):
         result["annotations"] = self.annotations.toJson()
         result["relationships"] = self.relationships.toJson()
         result["referenceModels"] = self.referenceModels.toJson()
-        return json.dumps(result)
+        return result
 
+    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None):
+        entity = None
+        entity_index = -1
+        for _entity_index, _entity in enumerate(self.entities):
+            if _entity.name.lower() == entity_name.lower():
+                entity = _entity
+                entity_index = _entity_index
+                break
+        else:
+            return AssertionError("Passed entity is not a part of current model.json")
+
+        if number_of_partition is None:
+            number_of_partition = 5
+        if isinstance(dataframe, pd.DataFrame):
+            dfs = np.array_split(dataframe, number_of_partition)
+        else:
+            dfs = dataframe.randomSplit([1.0 for _ in range(number_of_partition)])
+        
+        partitions = PartitionCollection()
+
+        for index in range(number_of_partition):
+            location  = '{entity_name}/{entity_name}.csv.snapshots/{entity_name}{index}.csv'.format(entity_name=entity_name, index=index)
+            url = writer.write_df(location, dfs[index])
+
+            partition = Partition()
+            partition.name = '{entity_name}{index}.csv'.format(entity_name=entity_name, index=index)
+            partition.location = url
+            partition.refreshTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
+
+            partitions.append(partition)
+
+        self.entities[entity_index].partitions = partitions
+
+        model_json = self.toJson()
+        writer.write_json("model.json", model_json)
+        return
+
+    def read_from_storage(self, entity_name, writer):
+        entity = None
+        entity_index = -1
+        for _entity_index, _entity in enumerate(self.entities):
+            if _entity.name.lower() == entity_name.lower():
+                entity = _entity
+                entity_index = _entity_index
+                break
+        else:
+            return AssertionError("Passed entity is not a part of current model.json")
+        
+
+        pass

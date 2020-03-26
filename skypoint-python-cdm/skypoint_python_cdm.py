@@ -1,18 +1,20 @@
 from Model import Model
 import pandas as pd
 from datetime import datetime
+from Partition import Partition
+from Partition import PartitionCollection
+from ADLSWriter import ADLSWriter
 import json
 
 
 if __name__ == "__main__":
     m = Model()
-    m.print()
 
-    df = {"country": ["Brazil", "Russia", "India", "China", "South Africa"],
-       "capital": ["Brasilia", "Moscow", "New Dehli", "Beijing", "Pretoria"],
-       "area": [8.516, 17.10, 3.286, 9.597, 1.221],
-       "population": [200.4, 143.5, 1252, 1357, 52.98],
-       "currentTime": [datetime.now(), datetime.now(), datetime.now(), datetime.now(), datetime.now()] }
+    df = {"country": ["Brazil", "Russia", "India", "China", "South Africa", "ParaSF"],
+       "currentTime": [datetime.now(), datetime.now(), datetime.now(), datetime.now(), datetime.now(), datetime.now()],
+       "area": [8.516, 17.10, 3.286, 9.597, 1.221, 2.222],
+       "capital": ["Brasilia", "Moscow", "New Dehli", "Beijing", "Pretoria", "ParaSF"],
+       "population": [200.4, 143.5, 1252, 1357, 52.98, 12.34] }
     df = pd.DataFrame(df)
 
 
@@ -24,6 +26,12 @@ if __name__ == "__main__":
     entity = Model.generate_entity(df, "customEntity")
     m.add_entity(entity)
     entity3 = Model.generate_entity(df2, "customEntity3")
+    entity3.partitions = PartitionCollection()
+    p = Partition()
+    p.name = "first"
+    p.location = "foo/bar/first.csv"
+    p.refreshTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
+    entity3.partitions.append(p)
     m.add_entity(entity3)
 
     Model.add_annotation("modelJsonAnnotation", "modelJsonAnnotationValue", m)
@@ -32,9 +40,14 @@ if __name__ == "__main__":
 
     m.add_relationship("PeopleFromCalifornia", "skypointId", "Profile", "skypointId")
 
-#    x = m.toJson()
-#    with open("foo.json", "w") as f:
-#        f.write(x)
+    writer = ADLSWriter("skypointicdpdataflow", "jUAf0LXrgZnwYrdJwXOMD7qGskNXs+fNbvqxCya3Km8+e4Gvh6IzjPNhx/LKWQS7kfy5JFmfK4JjpLSI/BFC9g==",
+                        "powerbi", "skypointicdpdataflow", "tempfolder")
+
+    m.write_to_storage("customEntity", df, writer)
+
+    x = m.toJson()
+    with open("foo.json", "w") as f:
+        f.write(json.dumps(x))
 
     with open("foo.json") as f:
         x = json.load(f)
@@ -43,6 +56,6 @@ if __name__ == "__main__":
 
     y = m2.toJson()
     with open("foo2.json", "w") as f:
-        f.write(y)
+        f.write(json.dumps(y))
 
     print(entity.name)
