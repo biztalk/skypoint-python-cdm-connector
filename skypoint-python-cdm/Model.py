@@ -1,6 +1,7 @@
 from DataObject import DataObject
 from SchemaEntry import SchemaEntry
 from Entity import EntityCollection
+from Entity import Entity
 from LocalEntity import LocalEntity
 from Annotation import AnnotationCollection
 from Relationship import RelationshipCollection
@@ -22,7 +23,7 @@ config.read("config.ini")
 
 class Model(DataObject):
     
-    def __init__(self, from_json=False, json=None, 
+    def __init__(self, from_json=False, json_data=None, 
                         application=config['DEFAULT']['application'], 
                         name=config['DEFAULT']['name'], 
                         description=config['DEFAULT']['description'], 
@@ -30,24 +31,45 @@ class Model(DataObject):
                         culture=None,
                         modified_time=None):
 
+        self.schema = [
+            SchemaEntry("application", String),
+            SchemaEntry("name", String),
+            SchemaEntry("description", String),
+            SchemaEntry("version", String),
+            SchemaEntry("culture", String),
+            SchemaEntry("modifiedTime", String),
+            SchemaEntry("isHidden", bool),
+            SchemaEntry("entities", EntityCollection),
+            SchemaEntry("annotations", AnnotationCollection),
+            SchemaEntry("relationships", RelationshipCollection),
+            SchemaEntry("referenceModels", ReferenceCollection)
+        ]
+        super().__init__(self.schema)
+        
         if from_json:
-            raise NotImplementedError("Not Implemented")
-        else:
-            self.schema = [
-                SchemaEntry("application", String),
-                SchemaEntry("name", String),
-                SchemaEntry("description", String),
-                SchemaEntry("version", String),
-                SchemaEntry("culture", String),
-                SchemaEntry("modifiedTime", String),
-                SchemaEntry("isHidden", bool),
-                SchemaEntry("entities", EntityCollection),
-                SchemaEntry("annotations", AnnotationCollection),
-                SchemaEntry("relationships", RelationshipCollection),
-                SchemaEntry("referenceModels", ReferenceCollection)
-            ]
-            super().__init__(self.schema)
+            self.application = json_data.get("application", None)
+            self.name = json_data["name"]
+            self.description = json_data.get("description", None)
+            self.version = json_data["application"]
+            self.culture = json_data.get("culture", None)
+            self.modifiedTime = json_data.get("modifiedTime", None)
+            self.isHidden = json_data.get("isHidden", None)
 
+            self.entities = EntityCollection.fromJson(json_data["entities"])
+
+            annotations = json_data.get("annotations", None)
+            if annotations is not None:
+                self.annotations = AnnotationCollection.fromJson(annotations)
+
+            relationships = json_data.get("relationships", None)
+            if relationships is not None:
+                self.relationships = RelationshipCollection.fromJson(relationships)
+
+            referenceModels = json_data.get("referenceModels", None)
+            if referenceModels is not None:
+                self.referenceModels = ReferenceCollection.fromJson(referenceModels)
+
+        else:
             self.application = application
             self.name = name
             self.description = description

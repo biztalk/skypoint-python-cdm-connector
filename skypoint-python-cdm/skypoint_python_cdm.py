@@ -1,6 +1,7 @@
 from Model import Model
 import pandas as pd
 from datetime import datetime
+import json
 
 
 if __name__ == "__main__":
@@ -31,8 +32,17 @@ if __name__ == "__main__":
 
     m.add_relationship("PeopleFromCalifornia", "skypointId", "Profile", "skypointId")
 
-    x = m.toJson()
-    with open("foo.json", "w") as f:
-        f.write(x)
+#    x = m.toJson()
+#    with open("foo.json", "w") as f:
+#        f.write(x)
+
+    with open("foo.json") as f:
+        x = json.load(f)
+
+    m2 = Model(True, x)
+
+    y = m2.toJson()
+    with open("foo2.json", "w") as f:
+        f.write(y)
 
     print(entity.name)

@@ -1,8 +1,10 @@
 from DataObject import DataObject
 from MetadataObject import MetadataObjectCollection
+from Polymorphic import Polymorphic
 import re
 
-class Entity(DataObject):
+
+class Entity(Polymorphic, DataObject):
     
     def __init__(self, schema=[]):
         super().__init__(schema)
@@ -17,3 +19,10 @@ class Entity(DataObject):
 
 class EntityCollection(MetadataObjectCollection):
     itemType = Entity
+
+    @classmethod
+    def fromJson(cls, entities):
+        result = EntityCollection()
+        for entity in entities:
+            result.append(Entity.fromJson(entity))
+        return result

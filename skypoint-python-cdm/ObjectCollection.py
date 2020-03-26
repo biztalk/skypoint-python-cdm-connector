@@ -11,3 +11,11 @@ class ObjectCollection(list, Base):
         for item in self:
             result.append(getattr(item, "toJson", lambda: item)())
         return result
+
+    @classmethod
+    def fromJson(cls, value):
+        result = cls()
+        ctor = getattr(cls.itemType, "fromJson", cls.itemType)
+        for item in value:
+            result.append(ctor(item, cls.itemType().getSchema()))
+        return result

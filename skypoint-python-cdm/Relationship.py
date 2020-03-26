@@ -1,8 +1,9 @@
 from Base import Base
 from ObjectCollection import ObjectCollection
+from Polymorphic import Polymorphic
 
 
-class Relationship(Base):
+class Relationship(Polymorphic, Base):
     def __init__(self, schema=[]):
         super().__init__(schema)
 

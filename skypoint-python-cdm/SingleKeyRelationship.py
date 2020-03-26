@@ -22,3 +22,8 @@ class SingleKeyRelationship(Relationship):
             raise ValueError("%s.toAttribute is not set" % (className, ))
         if self.fromAttribute == self.toAttribute:
             raise ValueError("%s must exist between different attribute references" % (className, ))
+
+    def toJson(self):
+        entity = super().toJson()
+        entity["$type"] = "SingleKeyRelationship"
+        return entity

@@ -15,3 +15,8 @@ class LocalEntity(Entity):
             SchemaEntry("partitions", PartitionCollection)
         ]
         super().__init__(self.schema)
+
+    def toJson(self):
+        entity = super().toJson()
+        entity["$type"] = "LocalEntity"
+        return entity

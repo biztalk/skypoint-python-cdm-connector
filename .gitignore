@@ -12,6 +12,7 @@ __pycache__/
 
 # foo.* temp files
 foo.*
+foo2.*
 
 # Distribution / packaging
 .Python

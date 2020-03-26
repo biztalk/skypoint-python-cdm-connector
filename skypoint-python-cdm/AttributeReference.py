@@ -24,3 +24,10 @@ class AttributeReference(Base):
         if not self.attributeName:
             raise ValueError("%s.attributeName is not set" % (className, ))
 
+    def getSchema(self):
+        return super().getSchema()
+
+    @classmethod
+    def fromJson(cls, value):
+        schema = AttributeReference().getSchema()
+        return super().fromJson(value, schema)

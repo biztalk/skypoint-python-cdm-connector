@@ -67,6 +67,9 @@
     <Compile Include="Partition.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Polymorphic.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Reference.py">
       <SubType>Code</SubType>
     </Compile>
