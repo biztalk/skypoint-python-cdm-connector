@@ -86,6 +86,9 @@
     <Compile Include="utils.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Writer.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="__init__.py">
       <SubType>Code</SubType>
     </Compile>
