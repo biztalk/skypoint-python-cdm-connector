@@ -10,35 +10,48 @@ We support Azure (ADLS), AWS (S3*) and Google Cloud (Cloud Storage*) Common Data
 
 ## Example
 
-1. Create an AAD app and give the service principal the "Storage Blob Data Contributor" role on the ADLSgen2 storage account used for your CDM data.
-2. Install the JAR in the `release` directory in this repo on your Spark cluster.
-3. Check out the below code for basic read and write examples.
+1. Please look into the sample usage file skypoint_python_cdm.py
+2. Dynamically add/remove entities, annotations and attributes
+3. Pass Reader and Writer object for any storage account you like to write/read data to/from.
+4. Check out the below code for basic read and write examples.
 
-```scala
-val df = spark.read.format("com.microsoft.cdm")
-                .option("cdmModel", "https://YOURADLSACCOUNT.dfs.core.windows.net/FILESYSTEM/path/to/model.json")
-                .option("entity", "Query")
-                .option("appId", "YOURAPPID")
-                .option("appKey", "YOURAPPKEY")
-                .option("tenantId", "YOURTENANTID")
-                .load()
+```python
+# Initialize empty model
+m = Model()
 
-// Do whatever spark transformations you want
-val transformedDf = df.filter(...)
+# Sample dataframe
+df = {"country": ["Brazil", "Russia", "India", "China", "South Africa", "ParaSF"],
+       "currentTime": [datetime.now(), datetime.now(), datetime.now(), datetime.now(), datetime.now(), datetime.now()],
+       "area": [8.516, 17.10, 3.286, 9.597, 1.221, 2.222],
+       "capital": ["Brasilia", "Moscow", "New Dehli", "Beijing", "Pretoria", "ParaSF"],
+       "population": [200.4, 143.5, 1252, 1357, 52.98, 12.34] }
+df = pd.DataFrame(df)
 
-// entity: name of the entity you wish to write.
-// modelDirectory: writes to a model.json file located at the root of this directory. note: if there is already a model.json in this directory, we will append an entity to it
-// modelName: name of the model to write. N/A in append case for now.
-transformedDf.write.format("com.microsoft.cdm")
-            .option("entity", "FilteredQueries")
-            .option("appId", "YOURAPPID")
-            .option("appKey", "YOURAPPKEY")
-            .option("tenantId", "YOURTENANTID")
-            .option("cdmFolder", "https://YOURADLSACCOUNT.dfs.core.windows.net/FILESYSTEM/path/to/output/directory/")
-            .option("cdmModelName", "MyData")
-            .save()
+# Generate entity from the dataframe
+entity = Model.generate_entity(df, "customEntity")
+
+# Add generated entity to model
+m.add_entity(entity)
+
+# Add model level annotation
+# Annotation can be added at entity level as well as attribute level
+Model.add_annotation("modelJsonAnnotation", "modelJsonAnnotationValue", m)
+
+
+# Create an ADLSWriter to write into ADLS
+writer = ADLSWriter("ACCOUNT_NAME", "ACCOUNT_KEY",
+                     "CONTAINER_NAME", "STORAGE_NAME", "DATAFLOW_NAME")    
+
+# Write data as well as model.json in ADLS storage
+m.write_to_storage("customEntity", df, writer)
 ```
 
 ## Contributing
 
 This project welcomes contributions and suggestions. 
+
+## References
+
+[Model.json version1 schema](https://github.com/microsoft/CDM/blob/master/docs/schema/modeljsonschema.json)
+
+[A clean implementation for Python Objects from/to model.json file](https://github.com/Azure-Samples/cdm-azure-data-services-integration/blob/master/CDM/python/CdmModel.py)
