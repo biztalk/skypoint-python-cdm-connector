@@ -16,8 +16,9 @@ setup(
     author_email="support@skypointcloud.com",
     license="GPL-3.0",
     classifiers=[
-        "License :: OSI Approved :: LGPL License",
-        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
     ],
     packages=["skypoint-python-cdm"],
     include_package_data=True,
