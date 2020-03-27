@@ -106,21 +106,26 @@ class Model(DataObject):
         relationship.toAttribute = to_attribute
         
         self.relationships.append(relationship)
-
+  
     @staticmethod
     def generate_entity(dataframe, name, description=None, _dtype_converter=None):
         entity = LocalEntity()
         entity.name = name
         entity.description = description
-
         if _dtype_converter is None:
             _dtype_converter = dtype_converter
-
-        for column_name, column_datatype in (dataframe.dtypes).items():
-            attribute = Attribute()
-            attribute.name = column_name
-            attribute.dataType = _dtype_converter.get(column_datatype, 'string')
-            entity.attributes.append(attribute)
+        if isinstance(dataframe, pd.DataFrame):
+            for column_name, column_datatype in (dataframe.dtypes).items():
+                attribute = Attribute()
+                attribute.name = column_name
+                attribute.dataType = _dtype_converter.get(column_datatype, 'string')
+                entity.attributes.append(attribute)
+        else:
+            for column_name, column_datatype in dataframe.dtypes:
+                attribute = Attribute()
+                attribute.name = column_name
+                attribute.dataType = _dtype_converter.get(column_datatype, 'string')
+                entity.attributes.append(attribute)
         return entity
 
     @staticmethod
@@ -163,29 +168,17 @@ class Model(DataObject):
                 break
         else:
             return AssertionError("Passed entity is not a part of current model.json")
-
-        if number_of_partition is None:
-            number_of_partition = 5
-        if isinstance(dataframe, pd.DataFrame):
-            dfs = np.array_split(dataframe, number_of_partition)
-        else:
-            dfs = dataframe.randomSplit([1.0 for _ in range(number_of_partition)])
         
         partitions = PartitionCollection()
-
-        for index in range(number_of_partition):
-            location  = '{entity_name}/{entity_name}.csv.snapshots/{entity_name}{index}.csv'.format(entity_name=entity_name, index=index)
-            url = writer.write_df(location, dfs[index])
-
+        location  = '{entity_name}/{entity_name}.csv.snapshots'.format(entity_name=entity_name)
+        names_and_urls = writer.write_df(location, dataframe, number_of_partition)
+        for name, url in names_and_urls:
             partition = Partition()
-            partition.name = '{entity_name}{index}.csv'.format(entity_name=entity_name, index=index)
+            partition.name = name
             partition.location = url
             partition.refreshTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
-
             partitions.append(partition)
-
         self.entities[entity_index].partitions = partitions
-
         model_json = self.toJson()
         writer.write_json("model.json", model_json)
         return
