@@ -21,5 +21,5 @@ setup(
     ],
     packages=["skypoint-python-cdm"],
     include_package_data=True,
-    install_requires=["requests"]
+    install_requires=["pandas==1.0.1","azure-storage-blob==2.1.0","numpy==1.18.2"]
 )
