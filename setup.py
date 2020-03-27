@@ -20,7 +20,7 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    packages=["skypoint-python-cdm"],
+    packages=["skypoint_python_cdm"],
     include_package_data=True,
     install_requires=["pandas==1.0.1","azure-storage-blob==2.1.0","numpy==1.18.2"]
 )
