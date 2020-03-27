@@ -4,6 +4,7 @@ from datetime import datetime
 from Partition import Partition
 from Partition import PartitionCollection
 from ADLSWriter import ADLSWriter
+from ADLSReader import ADLSReader
 import json
 
 
@@ -40,10 +41,16 @@ if __name__ == "__main__":
 
     m.add_relationship("PeopleFromCalifornia", "skypointId", "Profile", "skypointId")
 
-    writer = ADLSWriter("skypointicdpdataflow", "jUAf0LXrgZnwYrdJwXOMD7qGskNXs+fNbvqxCya3Km8+e4Gvh6IzjPNhx/LKWQS7kfy5JFmfK4JjpLSI/BFC9g==",
-                        "powerbi", "skypointicdpdataflow", "tempfolder")
+    writer = ADLSWriter("ACCOUNTNAME", "ACCOUNTKEY",
+                        "CONTAINERNAME", "STORAGENAME", "DATAFLOWNAME")    
+    
+    reader = ADLSReader("ACCOUNTNAME", "ACCOUNTKEY",
+                        "CONTAINERNAME", "STORAGENAME", "DATAFLOWNAME")    
 
     m.write_to_storage("customEntity", df, writer)
+
+    read_df = m.read_from_storage("customEntity", reader)
+    print(read_df)
 
     x = m.toJson()
     with open("foo.json", "w") as f:

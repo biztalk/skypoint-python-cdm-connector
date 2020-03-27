@@ -189,7 +189,7 @@ class Model(DataObject):
         writer.write_json("model.json", model_json)
         return
 
-    def read_from_storage(self, entity_name, writer):
+    def read_from_storage(self, entity_name, reader):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
@@ -200,5 +200,16 @@ class Model(DataObject):
         else:
             return AssertionError("Passed entity is not a part of current model.json")
         
+        locations = []
+        for partition in self.entities[entity_index].partitions:
+            locations.append(partition.location)
 
-        pass
+        headers = []
+        dtypes = []
+        attributes = self.entities[entity_index].attributes
+        for attribute in attributes:
+            headers.append(attribute.name)
+            dtypes.append({attribute.name: attribute.dataType})
+
+        dataframe = reader.read_df(locations, headers, dtypes)
+        return dataframe

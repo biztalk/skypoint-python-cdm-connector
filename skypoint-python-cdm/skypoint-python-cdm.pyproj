@@ -22,6 +22,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ADLSReader.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Annotation.py">
       <SubType>Code</SubType>
     </Compile>
@@ -68,6 +71,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Polymorphic.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Reader.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Reference.py">

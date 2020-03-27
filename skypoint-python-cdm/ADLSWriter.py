@@ -19,7 +19,7 @@ class ADLSWriter(Writer):
         """
             Write dataframe to specified blob storage location
         """
-        dataframe = dataframe.to_csv(index=False)
+        dataframe = dataframe.to_csv(index=False, header=False)
         block_blob_service = BlockBlobService(account_name=self.account_name, account_key=self.account_key)
         block_blob_service.create_blob_from_text(self.container_name + "/" + self.dataflow_name, blob_location, dataframe)
         blob_url = 'https://'+self.storage_name+'.dfs.core.windows.net/'+self.container_name+'/'+blob_location
