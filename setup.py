@@ -7,7 +7,7 @@ def readme():
 
 setup(
     name="cdm-connector",
-    version="0.0.2",
+    version="0.0.3",
     description="A Python package to read and write files in CDM format. Customized for SkyPoint use cases.",
     long_description=readme(),
     long_description_content_type="text/markdown",
