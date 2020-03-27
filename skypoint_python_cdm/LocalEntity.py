@@ -1,9 +1,9 @@
-from Entity import Entity
-from SchemaEntry import SchemaEntry
-from SchemaEntry import SchemaCollection
-from Attribute import AttributeCollection
-from Partition import PartitionCollection
-from utils import String
+from .Entity import Entity
+from .SchemaEntry import SchemaEntry
+from .SchemaEntry import SchemaCollection
+from .Attribute import AttributeCollection
+from .Partition import PartitionCollection
+from .utils import String
 
 
 class LocalEntity(Entity):

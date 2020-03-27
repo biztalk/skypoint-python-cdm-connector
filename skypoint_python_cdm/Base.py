@@ -1,4 +1,4 @@
-from utils import getattrIgnoreCase
+from .utils import getattrIgnoreCase
 from collections import OrderedDict
 
 

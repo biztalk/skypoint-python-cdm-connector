@@ -1,5 +1,5 @@
+from .Writer import Writer
 from azure.storage.blob import BlockBlobService
-from Writer import Writer
 import json
 import pandas as pd
 

@@ -1,7 +1,7 @@
-from Entity import Entity
-from SchemaEntry import SchemaEntry
-from utils import String
-from utils import DateTimeOffset
+from .Entity import Entity
+from .SchemaEntry import SchemaEntry
+from .utils import String
+from .utils import DateTimeOffset
 
 
 class ReferenceEntity(Entity):

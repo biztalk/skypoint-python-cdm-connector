@@ -1,4 +1,4 @@
-from JsonEnum import JsonEnum
+from .JsonEnum import JsonEnum
 
 class DataType(JsonEnum):
     Unclassified = "unclassified"

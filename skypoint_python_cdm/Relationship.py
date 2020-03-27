@@ -1,6 +1,6 @@
-from Base import Base
-from ObjectCollection import ObjectCollection
-from Polymorphic import Polymorphic
+from .Base import Base
+from .ObjectCollection import ObjectCollection
+from .Polymorphic import Polymorphic
 
 
 class Relationship(Polymorphic, Base):

@@ -1,7 +1,7 @@
-from Base import Base
-from ObjectCollection import ObjectCollection
-from SchemaEntry import SchemaEntry
-from utils import String
+from .Base import Base
+from .ObjectCollection import ObjectCollection
+from .SchemaEntry import SchemaEntry
+from .utils import String
 
 
 class Annotation(Base):

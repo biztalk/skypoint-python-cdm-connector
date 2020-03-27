@@ -1,7 +1,7 @@
-from MetadataObject import MetadataObject
-from MetadataObject import MetadataObjectCollection
-from SchemaEntry import SchemaEntry
-from CdmDataType import DataType
+from .MetadataObject import MetadataObject
+from .MetadataObject import MetadataObjectCollection
+from .SchemaEntry import SchemaEntry
+from .CdmDataType import DataType
 
 
 class Attribute(MetadataObject):

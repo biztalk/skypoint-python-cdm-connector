@@ -1,8 +1,8 @@
-from Base import Base
-from SchemaEntry import SchemaEntry
-from Annotation import AnnotationCollection
-from ObjectCollection import ObjectCollection
-from utils import String
+from .Base import Base
+from .SchemaEntry import SchemaEntry
+from .Annotation import AnnotationCollection
+from .ObjectCollection import ObjectCollection
+from .utils import String
 import re
 
 

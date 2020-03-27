@@ -1,9 +1,9 @@
-from DataObject import DataObject
-from SchemaEntry import SchemaEntry
-from FileFormatSettings import FileFormatSettings
-from MetadataObject import MetadataObjectCollection
-from utils import DateTimeOffset
-from utils import Uri
+from .DataObject import DataObject
+from .SchemaEntry import SchemaEntry
+from .FileFormatSettings import FileFormatSettings
+from .MetadataObject import MetadataObjectCollection
+from .utils import DateTimeOffset
+from .utils import Uri
 
 
 class Partition(DataObject):

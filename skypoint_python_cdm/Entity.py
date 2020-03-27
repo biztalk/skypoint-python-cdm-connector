@@ -1,6 +1,6 @@
-from DataObject import DataObject
-from MetadataObject import MetadataObjectCollection
-from Polymorphic import Polymorphic
+from .DataObject import DataObject
+from .MetadataObject import MetadataObjectCollection
+from .Polymorphic import Polymorphic
 import re
 
 

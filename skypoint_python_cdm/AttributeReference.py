@@ -1,6 +1,6 @@
-from Base import Base
-from SchemaEntry import SchemaEntry
-from utils import String
+from .Base import Base
+from .SchemaEntry import SchemaEntry
+from .utils import String
 
 class AttributeReference(Base):
     def __init__(self, schema=[]):

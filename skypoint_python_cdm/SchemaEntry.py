@@ -1,5 +1,5 @@
-from ObjectCollection import ObjectCollection
-from utils import Uri
+from .ObjectCollection import ObjectCollection
+from .utils import Uri
 
 
 class SchemaEntry(object):

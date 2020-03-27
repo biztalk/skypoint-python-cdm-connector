@@ -1,8 +1,8 @@
-from Base import Base
-from SchemaEntry import SchemaEntry
-from ObjectCollection import ObjectCollection
-from utils import String
-from utils import Uri
+from .Base import Base
+from .SchemaEntry import SchemaEntry
+from .ObjectCollection import ObjectCollection
+from .utils import String
+from .utils import Uri
 
 
 class Reference(Base):

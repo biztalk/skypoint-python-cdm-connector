@@ -1,5 +1,5 @@
+from .Reader import Reader
 from azure.storage.blob import BlockBlobService
-from Reader import Reader
 from io import StringIO
 import json
 import pandas as pd

@@ -1,28 +1,29 @@
-from DataObject import DataObject
-from SchemaEntry import SchemaEntry
-from Entity import EntityCollection
-from Entity import Entity
-from LocalEntity import LocalEntity
-from Annotation import AnnotationCollection
-from Relationship import RelationshipCollection
-from SingleKeyRelationship import SingleKeyRelationship
-from Reference import ReferenceCollection
-from Attribute import Attribute
-from Annotation import Annotation
-from AttributeReference import AttributeReference
-from Partition import Partition
-from Partition import PartitionCollection
+from .DataObject import DataObject
+from .SchemaEntry import SchemaEntry
+from .Entity import EntityCollection
+from .Entity import Entity
+from .LocalEntity import LocalEntity
+from .Annotation import AnnotationCollection
+from .Relationship import RelationshipCollection
+from .SingleKeyRelationship import SingleKeyRelationship
+from .Reference import ReferenceCollection
+from .Attribute import Attribute
+from .Annotation import Annotation
+from .AttributeReference import AttributeReference
+from .Partition import Partition
+from .Partition import PartitionCollection
+from .utils import String
+from .utils import dtype_converter
 from datetime import datetime
-from utils import String
 import pandas as pd
 import numpy as np
-import utils
 import json
 import pprint
 import configparser
+import os
 
 config = configparser.ConfigParser()
-config.read("config.ini")
+config.read(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config', 'config.ini'))
 
 
 class Model(DataObject):
@@ -107,18 +108,18 @@ class Model(DataObject):
         self.relationships.append(relationship)
 
     @staticmethod
-    def generate_entity(dataframe, name, description=None, dtype_converter=None):
+    def generate_entity(dataframe, name, description=None, _dtype_converter=None):
         entity = LocalEntity()
         entity.name = name
         entity.description = description
 
-        if dtype_converter is None:
-            dtype_converter = utils.dtype_converter
+        if _dtype_converter is None:
+            _dtype_converter = dtype_converter
 
         for column_name, column_datatype in (dataframe.dtypes).items():
             attribute = Attribute()
             attribute.name = column_name
-            attribute.dataType = dtype_converter.get(column_datatype, 'string')
+            attribute.dataType = _dtype_converter.get(column_datatype, 'string')
             entity.attributes.append(attribute)
         return entity
 

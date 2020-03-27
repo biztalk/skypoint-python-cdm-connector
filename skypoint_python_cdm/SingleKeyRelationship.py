@@ -1,7 +1,7 @@
-from Relationship import Relationship
-from SchemaEntry import SchemaEntry
-from AttributeReference import AttributeReference
-from utils import String
+from .Relationship import Relationship
+from .SchemaEntry import SchemaEntry
+from .AttributeReference import AttributeReference
+from .utils import String
 
 
 class SingleKeyRelationship(Relationship):

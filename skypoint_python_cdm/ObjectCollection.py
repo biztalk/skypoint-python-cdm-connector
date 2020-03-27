@@ -1,4 +1,4 @@
-from Base import Base
+from .Base import Base
 
 class ObjectCollection(list, Base):
     def append(self, item):

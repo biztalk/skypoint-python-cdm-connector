@@ -1,5 +1,5 @@
-from MetadataObject import MetadataObject
-from SchemaEntry import SchemaEntry
+from .MetadataObject import MetadataObject
+from .SchemaEntry import SchemaEntry
 
 
 class DataObject(MetadataObject):
