@@ -12,6 +12,7 @@ from .Annotation import Annotation
 from .AttributeReference import AttributeReference
 from .Partition import Partition
 from .Partition import PartitionCollection
+from .CdmDataType import DataType
 from .utils import String
 from .utils import dtype_converter
 from datetime import datetime
@@ -160,9 +161,10 @@ class Model(DataObject):
         attribute = Attribute()
         attribute.name = col_name
         if date_metadata is None:
-            attribute.dataType = _dtype_converter.get(column_datatype, 'string')
+            datatype_obj = DataType(_dtype_converter.get(column_datatype, 'string'))
+            attribute.dataType = datatype_obj
         else:
-            attribute.dataType = "dateTime"  # Hard coded datetime
+            attribute.dataType = DataType("dateTime")  # Hard coded datetime
             for key, value in date_metadata.items():
                 if not value == col_name:
                     Model.add_annotation(key, value, attribute)
