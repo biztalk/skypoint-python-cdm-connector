@@ -169,10 +169,10 @@ class Model(DataObject):
         return attribute
   
     @staticmethod
-    def __preprocess_dataframe_totimestamp(entity, dataframe, fn=None):
+    def __preprocess_dataframe_totimestamp(entity, dataframe, fn=None, lit=None):
         attributes = entity.attributes
         for attribute in attributes:
-            if attribute.dataType == "dateTime":
+            if attribute.dataType.value == "dateTime":
                 col_name = attribute.name
                 timeformat = None
                 timezone = None
@@ -198,10 +198,10 @@ class Model(DataObject):
         return dataframe
 
     @staticmethod
-    def __preprocess_dataframe_fromtimestamp(entity, dataframe, fn=None):
+    def __preprocess_dataframe_fromtimestamp(entity, dataframe, fn=None, lit=None):
         attributes = entity.attributes
         for attribute in attributes:
-            if attribute.dataType == "dateTime":
+            if attribute.dataType.value == "dateTime":
                 col_name = attribute.name
                 timeformat = None
                 timezone = None
@@ -278,7 +278,7 @@ class Model(DataObject):
         result["referenceModels"] = self.referenceModels.toJson()
         return result
 
-    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None):
+    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None, lit=None):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
@@ -296,7 +296,7 @@ class Model(DataObject):
         partitions = PartitionCollection()
         location  = '{entity_name}/{entity_name}.csv.snapshots'.format(entity_name=entity_name)
 
-        dataframe = Model.__preprocess_dataframe_totimestamp(entity, dataframe, fn=fn)
+        dataframe = Model.__preprocess_dataframe_totimestamp(entity, dataframe, fn=fn, lit=lit)
         names_and_urls = writer.write_df(location, dataframe, number_of_partition)
 
         for name, url in names_and_urls:
@@ -310,7 +310,7 @@ class Model(DataObject):
         writer.write_json("model.json", model_json)
         return
 
-    def read_from_storage(self, entity_name, reader, fn=None):
+    def read_from_storage(self, entity_name, reader, fn=None, lit=None):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
@@ -335,5 +335,5 @@ class Model(DataObject):
             dtypes.append({attribute.name: attribute.dataType})
 
         dataframe = reader.read_df(locations, headers, dtypes)
-        dataframe = Model.__preprocess_dataframe_fromtimestamp(entity, dataframe, fn=fn)
+        dataframe = Model.__preprocess_dataframe_fromtimestamp(entity, dataframe, fn=fn, lit=lit)
         return dataframe
