@@ -12,6 +12,5 @@ class Annotation(Base):
         ]
         super().__init__(self.schema)
 
-
 class AnnotationCollection(ObjectCollection):
     itemType = Annotation
