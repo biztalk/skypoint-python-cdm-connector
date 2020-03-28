@@ -15,7 +15,12 @@ from .Partition import PartitionCollection
 from .utils import String
 from .utils import dtype_converter
 from datetime import datetime
+from .utils import String
+from .utils import dtype_converter
+from .utils import to_utc_timestamp
+from .utils import from_utc_timestamp
 import pandas as pd
+import pytz
 import numpy as np
 import json
 import pprint
@@ -135,12 +140,127 @@ class Model(DataObject):
         entity level or attribute level.
         obj is an object in which if "annotations" is present
         then new annotation will be added.
-        """
+        """    
         annotation = Annotation()
         annotation.name = name
         annotation.value = value
-        obj.annotations.append(annotation)
+        added = False
+        for _annotation in obj.annotations:
+            if _annotation.name.lower() == annotation.name.lower():
+                _annotation.value = annotation.value
+                added = True
+                break
+        
+        if not added:
+            obj.annotations.append(annotation)
         return True
+
+    @staticmethod
+    def __add_attribute_with_date(col_name, column_datatype, _dtype_converter, date_metadata=None):
+        attribute = Attribute()
+        attribute.name = col_name
+        if date_metadata is None:
+            attribute.dataType = _dtype_converter.get(column_datatype, 'string')
+        else:
+            attribute.dataType = "dateTime"  # Hard coded datetime
+            for key, value in date_metadata.items():
+                if not value == col_name:
+                    Model.add_annotation(key, value, attribute)
+        return attribute
+  
+    @staticmethod
+    def __preprocess_dataframe_totimestamp(entity, dataframe, fn=None):
+        attributes = entity.attributes
+        for attribute in attributes:
+            if attribute.dataType == "dateTime":
+                col_name = attribute.name
+                timeformat = None
+                timezone = None
+                for annotation in attribute.annotations:
+                    if annotation.name == "format":
+                        timeformat = annotation.value
+                    if annotation.name == "timezone":
+                        timezone = annotation.value
+                if timezone:
+                    if isinstance(dataframe, pd.DataFrame):
+                        dataframe[col_name] = dataframe.apply(lambda x: to_utc_timestamp(x[col_name], timeformat, timezone), axis=1)
+                    elif fn is not None:
+                        dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat), lit(timezone)))
+                    else:
+                        raise AssertionError("For Spark Passed fn argument should not be null")
+                else:
+                    if isinstance(dataframe, pd.DataFrame):
+                        dataframe[col_name] = dataframe.apply(lambda x: to_utc_timestamp(x[col_name], timeformat), axis=1)
+                    elif fn is not None:
+                        dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat)))
+                    else:
+                        raise AssertionError("For Spark Passed fn argument should not be null")
+        return dataframe
+
+    @staticmethod
+    def __preprocess_dataframe_fromtimestamp(entity, dataframe, fn=None):
+        attributes = entity.attributes
+        for attribute in attributes:
+            if attribute.dataType == "dateTime":
+                col_name = attribute.name
+                timeformat = None
+                timezone = None
+                offset_hours = None
+                for annotation in attribute.annotations:
+                    if annotation.name == "format":
+                        timeformat = annotation.value
+                    elif annotation.name == "timezone":
+                        timezone = annotation.value
+                    elif annotation.name == "offset_hour":
+                        offset_hour = annotation.value
+
+                if timezone:
+                    if isinstance(dataframe, pd.DataFrame):
+                        dataframe[col_name] = dataframe.apply(lambda x: from_utc_timestamp(x[col_name], timeformat, timezone), axis=1)
+                    elif fn is not None:
+                        dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat), lit(timezone), lit(False)))
+                    else:
+                        raise AssertionError("For Spark Passed fn argument should not be null")
+                else:
+                    if isinstance(dataframe, pd.DataFrame):
+                        dataframe[col_name] = dataframe.apply(lambda x: from_utc_timestamp(x[col_name], timeformat, tz=offset_hour, offset_hour=True), axis=1)
+                    elif fn is not None:
+                        dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat), lit(offset_hour), lit(True)))
+                    else:
+                        raise AssertionError("For Spark Passed fn argument should not be null")
+        return dataframe
+
+    @staticmethod
+    def generate_entity(dataframe, name, description=None, _dtype_converter=None, date_metadata=None):
+        entity = LocalEntity()
+        entity.name = name
+        entity.description = description
+        if _dtype_converter is None:
+            _dtype_converter = dtype_converter
+
+        date_columns = []
+        if date_metadata is not None:
+            for date_metaobject in date_metadata:
+                date_columns.append(date_metaobject['col_name'])
+        
+        if isinstance(dataframe, pd.DataFrame):
+            for column_name, column_datatype in (dataframe.dtypes).items():
+                date_metaobject = None
+                if column_name in date_columns:
+                    date_metaobject = date_metadata[date_columns.index(column_name)]
+
+                attribute = Model.__add_attribute_with_date(column_name, column_datatype, _dtype_converter, date_metaobject)
+                entity.attributes.append(attribute)
+        else:
+            for column_name, column_datatype in dataframe.dtypes:
+                date_metaobject = None
+                if column_name in date_columns:
+                    date_metaobject = date_metadata[date_columns.index(column_name)]
+
+                attribute = Model.__add_attribute_with_date(column_name, column_datatype, _dtype_converter, date_metaobject)
+                entity.attributes.append(attribute)
+        return entity
+
 
 
     def toJson(self):
@@ -158,7 +278,7 @@ class Model(DataObject):
         result["referenceModels"] = self.referenceModels.toJson()
         return result
 
-    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None):
+    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
@@ -168,22 +288,29 @@ class Model(DataObject):
                 break
         else:
             return AssertionError("Passed entity is not a part of current model.json")
+
+        if number_of_partition is None:
+            number_of_partition = 1
         
+        entity = self.entities[entity_index]
         partitions = PartitionCollection()
         location  = '{entity_name}/{entity_name}.csv.snapshots'.format(entity_name=entity_name)
+
+        dataframe = Model.__preprocess_dataframe_totimestamp(entity, dataframe, fn=fn)
         names_and_urls = writer.write_df(location, dataframe, number_of_partition)
+
         for name, url in names_and_urls:
             partition = Partition()
             partition.name = name
             partition.location = url
             partition.refreshTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
             partitions.append(partition)
-        self.entities[entity_index].partitions = partitions
+        entity.partitions = partitions
         model_json = self.toJson()
         writer.write_json("model.json", model_json)
         return
 
-    def read_from_storage(self, entity_name, reader):
+    def read_from_storage(self, entity_name, reader, fn=None):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
@@ -193,17 +320,20 @@ class Model(DataObject):
                 break
         else:
             return AssertionError("Passed entity is not a part of current model.json")
+
+        entity = self.entities[entity_index]
         
         locations = []
-        for partition in self.entities[entity_index].partitions:
+        for partition in entity.partitions:
             locations.append(partition.location)
 
         headers = []
         dtypes = []
-        attributes = self.entities[entity_index].attributes
+        attributes = entity.attributes
         for attribute in attributes:
             headers.append(attribute.name)
             dtypes.append({attribute.name: attribute.dataType})
 
         dataframe = reader.read_df(locations, headers, dtypes)
+        dataframe = Model.__preprocess_dataframe_fromtimestamp(entity, dataframe, fn=fn)
         return dataframe
