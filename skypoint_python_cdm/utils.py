@@ -25,7 +25,9 @@ dtype_converter = {
 }
 
 
-def to_utc_timestamp(d, format, tz=None):    
+def to_utc_timestamp(d, format, tz=None):  
+    if d is None or d == '':
+        return ''  
     if not isinstance(d, datetime.datetime):
         d = datetime.datetime.strptime(d, format)
     if tz:
@@ -37,6 +39,8 @@ def to_utc_timestamp(d, format, tz=None):
 
 
 def from_utc_timestamp(d, format, tz=None, offset_hour=False):
+    if d is None or d == '':
+        return ''  
     d = str(d)
     if not offset_hour:
         tz = pytz.timezone(tz)
