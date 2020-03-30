@@ -39,7 +39,7 @@ def to_utc_timestamp(d, format, tz=None):
 
 
 def from_utc_timestamp(d, format, tz=None, offset_hour=False):
-    if d is None or d == '':
+    if d is None or d == '' or d != d:
         return ''  
     d = str(d)
     if not offset_hour:
