@@ -33,7 +33,7 @@ def to_utc_timestamp(d, format, tz=None):
         utc_time = tz.normalize(tz.localize(d)).astimezone(pytz.utc)
     else:
         utc_time = d.astimezone(pytz.utc)
-    return str(utc_time.timestamp())
+    return str(int(utc_time.timestamp()))
 
 
 def from_utc_timestamp(d, format, tz=None, offset_hour=False):
