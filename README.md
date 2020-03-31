@@ -5,9 +5,9 @@ A Apache Spark data source for the Microsoft Azure "Common Data Model". Reading 
 
 For more information about the Azure Common Data Model, check out [this page](https://docs.microsoft.com/en-us/common-data-model/data-lake). <br>
 
-We support Azure Data Lake Service (ADLS) as storage and usage within PySpark, Azure Functions etc.  
+We support Azure Data Lake Service (ADLS) as storage, historical data preservation using snapshots of the schema & data files and usage within PySpark, Azure Functions etc.  
 
-*Upcoming Support for [CDM 1.1](https://docs.microsoft.com/en-us/common-data-model/cdm-manifest) and AWS (S3*) and Google Cloud (Cloud Storage*) <br>
+*Upcoming Support for incremental data refresh handling, [CDM 1.1](https://docs.microsoft.com/en-us/common-data-model/cdm-manifest), AWS (S3) and Google Cloud (Cloud Storage). <br>
 
 ## Example
 
