@@ -1,12 +1,13 @@
 # skypoint-python-cdm-connector
 Python Spark CDM Connector by SkyPoint. 
 
-A prototype Spark data source for the Azure "Common Data Model". Reading and writing is supported, but 
-skypoint-python-cdm-connector is definitely a work in progress. Library is in early Alpha Stage. Please file issues for any bugs that you find. For more information about the Azure Common Data Model, check out [this page](https://docs.microsoft.com/en-us/common-data-model/data-lake). <br>
+A Apache Spark data source for the Microsoft Azure "Common Data Model". Reading and writing is supported and it is a work in progress. Library is in early stage and making progress each weekly sprint. Please file issues for any bugs that you find. 
 
-We support Azure (ADLS), AWS (S3*) and Google Cloud (Cloud Storage*) Common Data Model (CDM) Deployments. 
+For more information about the Azure Common Data Model, check out [this page](https://docs.microsoft.com/en-us/common-data-model/data-lake). <br>
 
-*Upcoming Support 
+We support Azure Data Lake Service (ADLS) as storage and usage within PySpark, Azure Functions etc.  
+
+*Upcoming Support for [CDM 1.1](https://docs.microsoft.com/en-us/common-data-model/cdm-manifest) and AWS (S3*) and Google Cloud (Cloud Storage*) <br>
 
 ## Example
 
