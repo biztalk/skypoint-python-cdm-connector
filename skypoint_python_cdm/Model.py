@@ -296,7 +296,8 @@ class Model(DataObject):
         
         entity = self.entities[entity_index]
         partitions = PartitionCollection()
-        location  = '{entity_name}/{entity_name}.csv.snapshots'.format(entity_name=entity_name)
+        run_time = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+        location  = '{entity_name}/{entity_name}.csv.snapshots-{run_time}'.format(entity_name=entity_name, run_time=run_time)
 
         dataframe = Model.__preprocess_dataframe_totimestamp(entity, dataframe, fn=fn, lit=lit)
         names_and_urls = writer.write_df(location, dataframe, number_of_partition)
@@ -309,6 +310,7 @@ class Model(DataObject):
             partitions.append(partition)
         entity.partitions = partitions
         model_json = self.toJson()
+        writer.create_snapshot("model.json", "model.json.snapshot")
         writer.write_json("model.json", model_json)
         return
 
