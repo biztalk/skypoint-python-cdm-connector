@@ -296,7 +296,7 @@ class Model(DataObject):
         
         entity = self.entities[entity_index]
         partitions = PartitionCollection()
-        run_time = datetime.datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
+        run_time = datetime.now().strftime("%d-%m-%Y-%H-%M-%S")
         location  = '{entity_name}/{entity_name}.csv.snapshots-{run_time}'.format(entity_name=entity_name, run_time=run_time)
 
         dataframe = Model.__preprocess_dataframe_totimestamp(entity, dataframe, fn=fn, lit=lit)
