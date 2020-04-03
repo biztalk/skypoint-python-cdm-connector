@@ -310,8 +310,8 @@ class Model(DataObject):
             partitions.append(partition)
         entity.partitions = partitions
         model_json = self.toJson()
-        writer.create_snapshot("model.json", "model.json.snapshot")
-        writer.write_json("model.json", model_json)
+        writer.create_snapshot(model_json_name, model_json_name + ".snapshot")
+        writer.write_json(model_json_name, model_json)
         return
 
     def read_from_storage(self, entity_name, reader, fn=None, lit=None):
