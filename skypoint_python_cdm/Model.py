@@ -280,7 +280,7 @@ class Model(DataObject):
         result["referenceModels"] = self.referenceModels.toJson()
         return result
 
-    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None, lit=None):
+    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None, lit=None, model_json_name="model.json"):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
