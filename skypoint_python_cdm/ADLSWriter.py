@@ -36,12 +36,12 @@ class ADLSWriter(Writer):
         proposed_lease_id_1 = str(uuid.uuid4())
         print("Lease id:", proposed_lease_id_1)
         block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=60, proposed_lease_id=proposed_lease_id_1)
-        t = datetime.datetime.now().strftime('%d-%M-%Y-%H-%M-%S')
-        file_path, filename = '/'.join(location.split('/')[:-1]), location.split('/')[-1]
+        # t = datetime.datetime.now().strftime('%d-%M-%Y-%H-%M-%S')
+        # file_path, filename = '/'.join(location.split('/')[:-1]), location.split('/')[-1]
         
-        # copy file into snapshot folder
-        old_blob_url = block_blob_service.make_blob_url(self.container_name, location)
-        block_blob_service.copy_blob(self.container_name, file_path + '/' + snapshot_folder_name + '/' + filename + '@snapshot' + t, old_blob_url)
+        # # copy file into snapshot folder
+        # old_blob_url = block_blob_service.make_blob_url(self.container_name, location)
+        # block_blob_service.copy_blob(self.container_name, file_path + '/' + snapshot_folder_name + '/' + filename + '@snapshot' + t, old_blob_url)
         content = json.loads(block_blob_service.get_blob_to_text(self.container_name, location, lease_id=proposed_lease_id_1).content)
         return (True, [content, proposed_lease_id_1])
     
