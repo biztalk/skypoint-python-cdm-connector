@@ -35,7 +35,8 @@ class ADLSWriter(Writer):
 
         proposed_lease_id_1 = str(uuid.uuid4())
         print("Lease id:", proposed_lease_id_1)
-        block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=60, proposed_lease_id=proposed_lease_id_1)
+        # block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=15, proposed_lease_id=proposed_lease_id_1)
+        block_blob_service.acquire_blob_lease(self.container_name, location, proposed_lease_id=proposed_lease_id_1)
         t = datetime.datetime.now().strftime('%d-%M-%Y-%H-%M-%S')
         file_path, filename = '/'.join(location.split('/')[:-1]), location.split('/')[-1]
         
