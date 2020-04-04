@@ -29,7 +29,7 @@ class ADLSWriter(Writer):
         print("Location:", location)
 
         exists = block_blob_service.exists(self.container_name, location)
-        print("Existingflag:", exists)
+        print("Existing flag:", exists)
         if not exists:
             return (False, [''])
 
