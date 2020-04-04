@@ -71,8 +71,8 @@ class ADLSWriter(Writer):
         json_dict = json.dumps(json_dict)
         block_blob_service = BlockBlobService(
             account_name=self.account_name, account_key=self.account_key)
-        block_blob_service.create_blob_from_text(self.container_name, self.dataflow_name+"/"+ blob_location, json_dict, lease_id=proposed_lease_id_1)
-        if proposed_lease_id_1:
-            block_blob_service.release_blob_lease(self.container_name, self.dataflow_name+"/"+ blob_location, lease_id=proposed_lease_id_1)
+        block_blob_service.create_blob_from_text(self.container_name, self.dataflow_name+"/"+ blob_location, json_dict, lease_id=lease_id)
+        if lease_id:
+            block_blob_service.release_blob_lease(self.container_name, self.dataflow_name+"/"+ blob_location, lease_id=lease_id)
         blob_url = 'https://'+self.storage_name+'.dfs.core.windows.net/'+self.container_name+'/'+blob_location
         return blob_url
