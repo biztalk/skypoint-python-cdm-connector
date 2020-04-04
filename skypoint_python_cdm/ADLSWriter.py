@@ -1,5 +1,6 @@
 from .Writer import Writer
 from azure.storage.blob import BlockBlobService
+import uuid
 import json
 import pandas as pd
 import numpy as np
@@ -16,9 +17,10 @@ class ADLSWriter(Writer):
         self.storage_name = storage_name
         self.dataflow_name = dataflow_name
 
-    def create_snapshot(self, location, snapshot_dir_name):
+    def get_existing(self, location, snapshot_dir_name):
         """
             Create a snapshot of the file current file in the passed directory name
+            and return flag along with current data
             location: dir1/dir2/dir3/filename.extension or "model.json"
             snashot_dir_name: Snapshot directory name
         """
@@ -27,19 +29,18 @@ class ADLSWriter(Writer):
 
         exists = block_blob_service.exists(self.container_name, location)
         if not exists:
-            return False
+            return (False, [''])
 
+        proposed_lease_id_1 = str(uuid.uuid4())
+        block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=15, proposed_lease_id=proposed_lease_id_1)
         t = datetime.datetime.now().strftime('%d-%M-%Y-%H-%M-%S')
         file_path, filename = '/'.join(location.split('/')[:-1]), location.split('/')[-1]
         
         # copy file into snapshot folder
         old_blob_url = block_blob_service.make_blob_url(self.container_name, location)
         block_blob_service.copy_blob(self.container_name, file_path + '/' + snapshot_folder_name + '/' + filename + '@snapshot' + t, old_blob_url)
-        new_blob_url = block_blob_service.make_blob_url(container_name, file_path + '/' + snapshot_folder_name + '/' + filename + '@snapshot' + t)
-        
-        # Delete old file
-        block_blob_service.delete_blob(container_name, filename)
-        return True
+        content = json.loads(block_blob_service.get_blob_to_text(self.container_name, location).content, lease_id=proposed_lease_id_1)
+        return (True, [content, proposed_lease_id_1])
     
     def write_df(self, blob_location, dataframe, number_of_partition=5):
         """
@@ -60,13 +61,15 @@ class ADLSWriter(Writer):
             result.append((filename, blob_url))
         return result
 
-    def write_json(self, blob_location, json_dict):
+    def write_json(self, blob_location, json_dict, lease_id=None):
         """
         write json to specified blob storage location
         """
         json_dict = json.dumps(json_dict)
         block_blob_service = BlockBlobService(
             account_name=self.account_name, account_key=self.account_key)
-        block_blob_service.create_blob_from_text(self.container_name, self.dataflow_name+"/"+ blob_location, json_dict)
+        block_blob_service.create_blob_from_text(self.container_name, self.dataflow_name+"/"+ blob_location, json_dict, lease_id=proposed_lease_id_1)
+        if proposed_lease_id_1:
+            block_blob_service.release_blob_lease(self.container_name, self.dataflow_name+"/"+ blob_location, lease_id=proposed_lease_id_1)
         blob_url = 'https://'+self.storage_name+'.dfs.core.windows.net/'+self.container_name+'/'+blob_location
         return blob_url

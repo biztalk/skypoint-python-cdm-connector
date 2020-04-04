@@ -20,6 +20,9 @@ from .utils import String
 from .utils import dtype_converter
 from .utils import to_utc_timestamp
 from .utils import from_utc_timestamp
+from retry.api import retry_call
+import time
+import random
 import pandas as pd
 import pytz
 import numpy as np
@@ -309,9 +312,41 @@ class Model(DataObject):
             partition.refreshTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
             partitions.append(partition)
         entity.partitions = partitions
-        model_json = self.toJson()
-        writer.create_snapshot(model_json_name, model_json_name + ".snapshot")
-        writer.write_json(model_json_name, model_json)
+        random_sleep_time = random.randint(1, 5)
+        time.sleep(random_sleep_time)
+        existing, content = retry_call(writer.get_existing, fargs=[model_json_name, model_json_name + ".snapshot"], delay=1, jitter=0.5)
+        
+        # If JSON already exists
+        if existing:
+            json_data, lease_id = content[0], content[1]
+
+            # Append entities    
+            for entity in EntityCollection.fromJson(json_data["entities"]):
+                self.entities.append(entity)
+
+            # Append Annotations
+            annotations = json_data.get("annotations", None)
+            if annotations is not None:
+                for annotation in AnnotationCollection.fromJson(annotations):
+                    self.annotations.append(annotation)
+
+            # Append relationships
+            relationships = json_data.get("relationships", None)
+            if relationships is not None:
+                for relationship in RelationshipCollection.fromJson(relationships):
+                    self.relationships.append(relationship)
+
+            # Append Reference Models
+            referenceModels = json_data.get("referenceModels", None)
+            if referenceModels is not None:
+                for referenceModel in ReferenceCollection.fromJson(referenceModels):
+                    self.referenceModels.append(referenceModel)
+
+            model_json = self.toJson()
+            writer.write_json(model_json_name, model_json, lease_id=lease_id)
+        else:
+            model_json = self.toJson()
+            writer.write_json(model_json_name, model_json, lease_id=None)
         return
 
     def read_from_storage(self, entity_name, reader, fn=None, lit=None):
