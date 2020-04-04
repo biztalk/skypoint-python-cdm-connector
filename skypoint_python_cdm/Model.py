@@ -314,8 +314,9 @@ class Model(DataObject):
         entity.partitions = partitions
         random_sleep_time = random.randint(1, 5)
         time.sleep(random_sleep_time)
+        print("Starting snapshot")
         existing, content = retry_call(writer.get_existing, fargs=[model_json_name, model_json_name + ".snapshot"], delay=1, jitter=0.5)
-        
+        print("Snapshot done")
         # If JSON already exists
         if existing:
             json_data, lease_id = content[0], content[1]
@@ -343,9 +344,11 @@ class Model(DataObject):
                     self.referenceModels.append(referenceModel)
 
             model_json = self.toJson()
+            print("Writing model.json after lock")
             writer.write_json(model_json_name, model_json, lease_id=lease_id)
         else:
             model_json = self.toJson()
+            print("Writing model.json without lock")
             writer.write_json(model_json_name, model_json, lease_id=None)
         return
 
