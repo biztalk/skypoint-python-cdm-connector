@@ -26,8 +26,10 @@ class ADLSWriter(Writer):
         """
         if location.strip() == "model.json":
             location = self.dataflow_name + "/" + location
+        print("Location:", location)
 
         exists = block_blob_service.exists(self.container_name, location)
+        print("Existingflag:", exists)
         if not exists:
             return (False, [''])
 
