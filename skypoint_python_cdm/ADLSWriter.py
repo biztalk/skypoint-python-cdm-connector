@@ -42,7 +42,7 @@ class ADLSWriter(Writer):
         # # copy file into snapshot folder
         # old_blob_url = block_blob_service.make_blob_url(self.container_name, location)
         # block_blob_service.copy_blob(self.container_name, file_path + '/' + snapshot_folder_name + '/' + filename + '@snapshot' + t, old_blob_url)
-        content = json.loads(block_blob_service.get_blob_to_text(self.container_name, location).content, lease_id=proposed_lease_id_1)
+        content = json.loads(block_blob_service.get_blob_to_text(self.container_name, location, lease_id=proposed_lease_id_1).content)
         return (True, [content, proposed_lease_id_1])
     
     def write_df(self, blob_location, dataframe, number_of_partition=5):
