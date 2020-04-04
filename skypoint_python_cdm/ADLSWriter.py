@@ -35,8 +35,7 @@ class ADLSWriter(Writer):
 
         proposed_lease_id_1 = str(uuid.uuid4())
         print("Lease id:", proposed_lease_id_1)
-        # block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=15, proposed_lease_id=proposed_lease_id_1)
-        block_blob_service.acquire_blob_lease(self.container_name, location, proposed_lease_id=proposed_lease_id_1)
+        block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=60, proposed_lease_id=proposed_lease_id_1)
         t = datetime.datetime.now().strftime('%d-%M-%Y-%H-%M-%S')
         file_path, filename = '/'.join(location.split('/')[:-1]), location.split('/')[-1]
         
@@ -69,11 +68,12 @@ class ADLSWriter(Writer):
         """
         write json to specified blob storage location
         """
+        print("Writing Model.json with leaseid:", lease_id)
         json_dict = json.dumps(json_dict)
         block_blob_service = BlockBlobService(
             account_name=self.account_name, account_key=self.account_key)
         block_blob_service.create_blob_from_text(self.container_name, self.dataflow_name+"/"+ blob_location, json_dict, lease_id=lease_id)
         if lease_id:
-            block_blob_service.release_blob_lease(self.container_name, self.dataflow_name+"/"+ blob_location, lease_id=lease_id)
+            block_blob_service.release_blob_lease(self.container_name, self.dataflow_name+"/"+ blob_location, lease_id)
         blob_url = 'https://'+self.storage_name+'.dfs.core.windows.net/'+self.container_name+'/'+blob_location
         return blob_url
