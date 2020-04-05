@@ -324,7 +324,11 @@ class Model(DataObject):
 
             # Append entities    
             for entity in EntityCollection.fromJson(json_data["entities"]):
-                self.entities.append(entity)
+                for old_entity in self.entities:
+                    if old_entity.name.lower() == entity.name.lower():
+                        break
+                else:
+                    self.entities.append(entity)
 
             # Append Annotations
             annotations = json_data.get("annotations", None)
