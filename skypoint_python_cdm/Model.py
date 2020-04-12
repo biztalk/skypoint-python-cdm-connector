@@ -316,7 +316,7 @@ class Model(DataObject):
         time.sleep(random_sleep_time)
         print("Starting snapshot")
         print("Writer object:", writer.get_existing)
-        existing, content = retry_call(writer.get_existing, fargs=[model_json_name, model_json_name + ".snapshot"], delay=1, jitter=0.5)
+        existing, content = retry_call(writer.get_existing, fargs=[model_json_name, model_json_name + ".snapshots"], delay=1, jitter=0.5)
         print("Snapshot done")
         # If JSON already exists
         if existing:
