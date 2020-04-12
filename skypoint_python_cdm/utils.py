@@ -57,7 +57,8 @@ def from_utc_timestamp(d, format, tz=None, offset_hour=False):
             days = 0
             total_second = (hour * 60 + minutes) * 60
         converted_time = datetime.datetime.strptime(d, "%Y-%m-%dT%H:%M:%S.%fZ")
-        converted_time = converted_time + datetime.timedelta(days=days, seconds=total_second)
+        converted_time = converted_time.replace(tzinfo=datetime.timezone(datetime.timedelta(days=days, seconds=total_second)))
+        # converted_time = converted_time + datetime.timedelta(days=days, seconds=total_second)
         # converted_time = datetime.datetime.fromtimestamp(int(d.split(".")[0]), 
         #                     datetime.timezone(datetime.timedelta(days=days, seconds=total_second)))
     return converted_time.strftime(format)
