@@ -7,7 +7,7 @@ def readme():
 
 setup(
     name="cdm-connector",
-    version="0.0.6.36",
+    version="0.0.6.37",
     description="A Python package to read and write files in CDM format. Customized for SkyPoint use cases.",
     long_description=readme(),
     long_description_content_type="text/markdown",
@@ -23,5 +23,5 @@ setup(
     packages=["skypoint_python_cdm"],
     package_data={'skypoint_python_cdm':['config/*',]},
     include_package_data=True,
-    install_requires=["pandas==1.0.1","azure-storage-blob==2.1.0","numpy==1.18.2"]
+    install_requires=["pandas==1.0.1","azure-storage-blob==2.1.0","numpy==1.18.2", "retry==0.9.2"]
 )
