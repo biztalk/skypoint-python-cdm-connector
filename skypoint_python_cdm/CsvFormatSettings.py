@@ -16,9 +16,14 @@ class CsvStyle(JsonEnum):
 class CsvFormatSettings(FileFormatSettings):
     def __init__(self, schema=[]):
         self.schema = schema + [
-            SchemaEntry("columnHeaders", bool, False),
-            SchemaEntry("delimiter", String, ","),
-            SchemaEntry("quoteStyle", CsvQuoteStyle, CsvQuoteStyle.Csv),
-            SchemaEntry("csvStyle", CsvStyle, CsvStyle.QuoteAlways),
+            SchemaEntry("columnHeaders", bool),
+            SchemaEntry("delimiter", String),
+            SchemaEntry("quoteStyle", CsvQuoteStyle),
+            SchemaEntry("csvStyle", CsvStyle),
         ]
         super().__init__(self.schema)
+
+    def toJson(self):
+        entity = super().toJson()
+        entity["$type"] = "CsvFormatSettings"
+        return entity

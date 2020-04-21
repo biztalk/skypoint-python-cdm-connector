@@ -12,6 +12,7 @@ from .Annotation import Annotation
 from .AttributeReference import AttributeReference
 from .Partition import Partition
 from .Partition import PartitionCollection
+from .CsvFormatSettings import CsvFormatSettings
 from .CdmDataType import DataType
 from .utils import String
 from .utils import dtype_converter
@@ -283,7 +284,7 @@ class Model(DataObject):
         result["referenceModels"] = self.referenceModels.toJson()
         return result
 
-    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None, lit=None, model_json_name="model.json"):
+    def write_to_storage(self, entity_name, dataframe, writer, number_of_partition=None, fn=None, lit=None, model_json_name="model.json", csv_delimiter=",", column_headers=False, csv_quote_style="QuoteStyle.Csv", csv_style="CsvStyle.QuoteAlways"):
         entity = None
         entity_index = -1
         for _entity_index, _entity in enumerate(self.entities):
@@ -310,6 +311,14 @@ class Model(DataObject):
             partition.name = name
             partition.location = url
             partition.refreshTime = datetime.now().strftime('%Y-%m-%dT%H:%M:%S%z')
+            
+            csvFormatSettings = CsvFormatSettings()
+            csvFormatSettings.delimiter = csv_delimiter
+            csvFormatSettings.columnHeaders = column_headers
+            csvFormatSettings.quoteStyle = csv_quote_style
+            csvFormatSettings.csvStyle = csv_style
+            
+            partition.fileFormatSettings = csvFormatSettings
             partitions.append(partition)
         entity.partitions = partitions
         random_sleep_time = random.randint(1, 5)
