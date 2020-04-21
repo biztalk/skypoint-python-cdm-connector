@@ -1,6 +1,7 @@
 from .Base import Base
 from .JsonEnum import JsonEnum
 from .utils import String
+from .SchemaEntry import SchemaEntry
 from .FileFormatSettings import FileFormatSettings
 
 class CsvQuoteStyle(JsonEnum):
