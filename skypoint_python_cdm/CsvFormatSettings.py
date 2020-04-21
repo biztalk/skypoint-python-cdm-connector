@@ -20,7 +20,7 @@ class CsvFormatSettings(FileFormatSettings):
             SchemaEntry("columnHeaders", bool),
             SchemaEntry("delimiter", String),
             SchemaEntry("quoteStyle", CsvQuoteStyle),
-            SchemaEntry("csvStyle", CsvStyle),
+            SchemaEntry("csvStyle", CsvStyle)
         ]
         super().__init__(self.schema)
 

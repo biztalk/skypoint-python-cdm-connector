@@ -1,5 +1,8 @@
 from .Base import Base
+from .Polymorphic import Polymorphic
 
 
-class FileFormatSettings(Base):
+class FileFormatSettings(Polymorphic, Base):    
     pass
+
+
