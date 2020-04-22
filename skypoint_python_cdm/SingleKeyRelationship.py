@@ -2,6 +2,7 @@ from .Relationship import Relationship
 from .SchemaEntry import SchemaEntry
 from .AttributeReference import AttributeReference
 from .utils import String
+from collections import OrderedDict
 
 
 class SingleKeyRelationship(Relationship):
@@ -24,6 +25,9 @@ class SingleKeyRelationship(Relationship):
             raise ValueError("%s must exist between different attribute references" % (className, ))
 
     def toJson(self):
+        result = OrderedDict()
+        result["$type"] = "SingleKeyRelationship"
         entity = super().toJson()
-        entity["$type"] = "SingleKeyRelationship"
-        return entity
+        for k, v in entity.items():
+            result[k] = v
+        return result

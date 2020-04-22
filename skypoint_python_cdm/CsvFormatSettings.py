@@ -3,6 +3,8 @@ from .JsonEnum import JsonEnum
 from .utils import String
 from .SchemaEntry import SchemaEntry
 from .FileFormatSettings import FileFormatSettings
+from collections import OrderedDict
+
 
 class CsvQuoteStyle(JsonEnum):
     Csv = "QuoteStyle.Csv"
@@ -25,6 +27,9 @@ class CsvFormatSettings(FileFormatSettings):
         super().__init__(self.schema)
 
     def toJson(self):
+        result = OrderedDict()
+        result["$type"] = "CsvFormatSettings"
         entity = super().toJson()
-        entity["$type"] = "CsvFormatSettings"
-        return entity
+        for k, v in entity.items():
+            result[k] = v
+        return result
