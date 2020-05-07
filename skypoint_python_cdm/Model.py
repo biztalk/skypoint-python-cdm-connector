@@ -28,7 +28,7 @@ import pandas as pd
 import pytz
 import numpy as np
 import json
-import pprint
+import p#print
 import configparser
 import os
 
@@ -323,10 +323,10 @@ class Model(DataObject):
         entity.partitions = partitions
         random_sleep_time = random.randint(1, 5)
         time.sleep(random_sleep_time)
-        print("Starting snapshot")
-        print("Writer object:", writer.get_existing)
+        #print("Starting snapshot")
+        #print("Writer object:", writer.get_existing)
         existing, content = retry_call(writer.get_existing, fargs=[model_json_name, model_json_name + ".snapshots"], delay=1, jitter=0.5)
-        print("Snapshot done")
+        #print("Snapshot done")
         # If JSON already exists
         if existing:
             json_data, lease_id = content[0], content[1]
@@ -358,11 +358,11 @@ class Model(DataObject):
                     self.referenceModels.append(referenceModel)
 
             model_json = self.toJson()
-            print("Writing model.json after lock")
+            #print("Writing model.json after lock")
             writer.write_json(model_json_name, model_json, lease_id=lease_id)
         else:
             model_json = self.toJson()
-            print("Writing model.json without lock")
+            #print("Writing model.json without lock")
             writer.write_json(model_json_name, model_json, lease_id=None)
         return
 

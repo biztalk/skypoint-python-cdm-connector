@@ -27,15 +27,15 @@ class ADLSWriter(Writer):
         """
         if location.strip() == "model.json":
             location = self.dataflow_name + "/" + location
-        print("Location:", location)
+        #print("Location:", location)
         block_blob_service = BlockBlobService(account_name=self.account_name, account_key=self.account_key)
         exists = block_blob_service.exists(self.container_name, location)
-        print("Existing flag:", exists)
+        #print("Existing flag:", exists)
         if not exists:
             return (False, [''])
 
         proposed_lease_id_1 = str(uuid.uuid4())
-        print("Lease id:", proposed_lease_id_1)
+        #print("Lease id:", proposed_lease_id_1)
         block_blob_service.acquire_blob_lease(self.container_name, location, lease_duration=60, proposed_lease_id=proposed_lease_id_1)
         t = datetime.datetime.now().strftime('%Y-%M-%dT%H:%M:%S.%fZ')
         file_path, filename = '/'.join(location.split('/')[:-1]), location.split('/')[-1]
@@ -69,7 +69,7 @@ class ADLSWriter(Writer):
         """
         write json to specified blob storage location
         """
-        print("Writing Model.json with leaseid:", lease_id)
+        #print("Writing Model.json with leaseid:", lease_id)
         json_dict = json.dumps(json_dict)
         block_blob_service = BlockBlobService(
             account_name=self.account_name, account_key=self.account_key)
