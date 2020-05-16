@@ -1,7 +1,7 @@
 # skypoint-python-cdm-connector
 Python Spark CDM Connector by SkyPoint. 
 
-Apache Spark connector for the Microsoft Azure "Common Data Model". Reading and writing is supported and it is a work in progress. Library is in early stage and making progress each weekly s#print. Please file issues for any bugs that you find. 
+Apache Spark connector for the Microsoft Azure "Common Data Model". Reading and writing is supported and it is a work in progress. Please file issues for any bugs that you find. 
 
 For more information about the Azure Common Data Model, check out [this page](https://docs.microsoft.com/en-us/common-data-model/data-lake). <br>
 
