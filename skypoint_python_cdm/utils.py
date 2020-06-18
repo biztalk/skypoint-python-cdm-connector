@@ -13,16 +13,19 @@ def getattrIgnoreCase(obj, attr, default=None):
 
 dtype_converter = {
     'int': 'int64',
+    'int64' : 'int64',
     'bigint': 'int64',
     'long': 'int64',
+    'float64' : 'double',
     'float':'decimal',
     'double': 'double',
     'decimal.Decimal': 'decimal',
     'string': 'string',
     'bool': 'boolean',
     'datetime': 'dateTime',
-    'timestamp': 'dateTime'
+    'timestamp': 'dateTime',
 }
+
 
 
 def to_utc_timestamp(d, format='%Y-%m-%d %H:%M:%S', tz=None):  

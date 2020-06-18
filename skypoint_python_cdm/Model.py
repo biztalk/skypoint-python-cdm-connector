@@ -28,7 +28,7 @@ import pandas as pd
 import pytz
 import numpy as np
 import json
-import p#print
+# import p#print
 import configparser
 import os
 
@@ -165,6 +165,7 @@ class Model(DataObject):
         attribute = Attribute()
         attribute.name = col_name
         if date_metadata is None:
+            column_datatype = str(column_datatype)
             datatype_obj = DataType(_dtype_converter.get(column_datatype, 'string'))
             attribute.dataType = datatype_obj
         else:
@@ -194,13 +195,16 @@ class Model(DataObject):
                         dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat), lit(timezone)))
                     else:
                         raise AssertionError("For Spark Passed fn argument should not be null")
-                else:
+                elif timeformat:
                     if isinstance(dataframe, pd.DataFrame):
                         dataframe[col_name] = dataframe.apply(lambda x: to_utc_timestamp(x[col_name], timeformat), axis=1)
                     elif fn is not None:
                         dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat)))
                     else:
                         raise AssertionError("For Spark Passed fn argument should not be null")
+                else:
+                    pass
+                
         return dataframe
 
     @staticmethod
@@ -227,13 +231,15 @@ class Model(DataObject):
                         dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat), lit(timezone), lit(False)))
                     else:
                         raise AssertionError("For Spark Passed fn argument should not be null")
-                else:
+                elif timeformat:
                     if isinstance(dataframe, pd.DataFrame):
                         dataframe[col_name] = dataframe.apply(lambda x: from_utc_timestamp(x[col_name], timeformat, tz=offset_hour, offset_hour=True), axis=1)
                     elif fn is not None:
                         dataframe = dataframe.withColumn(col_name, fn(dataframe[col_name], lit(timeformat), lit(offset_hour), lit(True)))
                     else:
                         raise AssertionError("For Spark Passed fn argument should not be null")
+                else:
+                    pass
         return dataframe
 
     @staticmethod
@@ -349,7 +355,13 @@ class Model(DataObject):
             relationships = json_data.get("relationships", None)
             if relationships is not None:
                 for relationship in RelationshipCollection.fromJson(relationships):
-                    self.relationships.append(relationship)
+                    same = False
+                    for current_relationship in self.relationships:
+                        if Model.is_same_relationship(relationship, current_relationship):
+                            same = True
+                            break
+                    if not same:
+                        self.relationships.append(relationship)
 
             # Append Reference Models
             referenceModels = json_data.get("referenceModels", None)
@@ -365,6 +377,24 @@ class Model(DataObject):
             #print("Writing model.json without lock")
             writer.write_json(model_json_name, model_json, lease_id=None)
         return
+    
+    @staticmethod
+    def is_same_relationship(first_relationship, second_relationship):
+        first_from_attribute = first_relationship.fromAttribute
+        second_from_attribute = second_relationship.fromAttribute
+        first_to_attribute = first_relationship.toAttribute
+        second_to_attribute = second_relationship.toAttribute
+        same_from = False
+        same_to = False
+        if first_from_attribute.entityName.lower() == second_from_attribute.entityName.lower() and first_from_attribute.attributeName.lower() == second_from_attribute.attributeName.lower():
+            same_from = True
+
+        if first_to_attribute.entityName.lower() == second_to_attribute.entityName.lower() and first_to_attribute.attributeName.lower() == second_to_attribute.attributeName.lower():
+            same_to = True
+        
+        if same_from and same_to:
+            return True
+        return False
 
     def read_from_storage(self, entity_name, reader, fn=None, lit=None):
         entity = None

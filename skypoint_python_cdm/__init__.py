@@ -19,3 +19,4 @@ from .utils import *
 from .ADLSWriter import *
 from .ADLSReader import *
 from .ADLSPandasReader import *
+from .S3Writer import *
